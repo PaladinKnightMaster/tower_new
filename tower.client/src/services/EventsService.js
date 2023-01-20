@@ -5,7 +5,7 @@ import { router } from "../router.js"
 import { api } from "./AxiosService.js"
 
 class EventsService {
-  // TODO event.type is used in process to make categorize buttons by type 
+  // NOTE Will make a get request on a type of event or of all the events in api if no type is selected
   async getEvents(type = '') {
     let res
     if (type) {
@@ -18,39 +18,36 @@ class EventsService {
       res = await api.get('/api/events')
     }
     AppState.events = res.data.map(e => new Event(e))
-    // console.log(AppState.events);
   }
-  // async getMyEvents(id) {
 
+  // NOTE unfinished but process to request events made by user started  
+  // async getMyEvents(id) {
   //   res = await api.get('/api/events', {
   //     params: {
   //       creator: id
   //     }
   //   })
-
   // }
 
-
+  // NOTE simple get request to server for a specific event based on Id
   async getEventById(id) {
     const res = await api.get(`/api/events/${id}`)
     AppState.selectedEvent = new Event(res.data)
   }
 
+  // NOTE Will send data to server to create a new event and send the user to the newly made page with their event details
   async postEvent(formData) {
-    // const post = new Event(formData)
     const res = await api.post('/api/events', formData)
     const event = new Event(res.data)
     AppState.events = [...AppState.events, event]
 
-    // NOTE does onMounted not get applied when already on this screen?
     router.push({ name: 'Event', params: { id: event.id } })
     this.getEventById(event.id)
   }
 
+  // NOTE Will send request to server to archive Event and push to home where event status is updated
   async deleteEvent(id) {
     await api.delete(`/api/events/${id}`)
-    // AppState.events = AppState.events.filter(e => e.id != id)
-    console.log(AppState.selectedEvent)
     router.push({ name: 'Home' })
   }
 }
